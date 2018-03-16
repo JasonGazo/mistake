@@ -1,0 +1,757 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>assignment3part2and3</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-16"><meta name="DC.source" content="assignment3part2and3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Part 3: Question A</a></li><li><a href="#3">Generate the Voltage Map and Electric Fields</a></li><li><a href="#4">Monte Carlo Simulation:</a></li><li><a href="#5">Summary</a></li></ul></div><pre class="codeinput"><span class="comment">%%Assignment 3: Part 3</span>
+</pre><h2>Part 3: Question A<a name="2"></a></h2><pre class="codeinput"><span class="comment">%Firstly, the voltage map and electric field plots shown in part2 will be</span>
+<span class="comment">%generated again. This time, the voltage map will be coupled with the monte</span>
+<span class="comment">%carlo simulation of the particles moving amongst two conductive</span>
+<span class="comment">%(reflective) material.</span>
+clc
+</pre><h2>Generate the Voltage Map and Electric Fields<a name="3"></a></h2><pre class="codeinput"><span class="comment">%The finite difference method will be used again:</span>
+
+<span class="comment">%Set Frame Size</span>
+L=30;
+nx = 2*L/3;
+ny = L;
+
+<span class="comment">%Voltage at boundary</span>
+vx=1;
+
+G = sparse(nx*ny);
+v = zeros(1,nx*ny);
+
+<span class="comment">%Conductivity outside box</span>
+sig1 = 1;
+<span class="comment">%Conductivity inside box</span>
+sig2 = 1e-2;
+
+<span class="comment">%Establish dimensions of each box</span>
+<span class="comment">% [Left side, right side, top of box, bottom of box]</span>
+box1 = [nx*1.5/5 nx*3.5/5 ny ny*3/5];
+box2 = [nx*1.5/5 nx*3.5/5 ny*2/5 0];
+
+<span class="comment">%1. Distribution of conductivity in material (conductivity matrix)</span>
+sigma=ones(nx,ny);
+<span class="keyword">for</span> i=1:nx
+    <span class="keyword">for</span> j=1:ny
+        <span class="keyword">if</span>(i &gt; box1(1) &amp;&amp; i &lt; box1(2) &amp;&amp; (j &lt; box2(3)||j &gt; box1(4)))
+            sigma(i,j)=1e-2;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%2. Build G matrix and plot Voltage Map</span>
+<span class="keyword">for</span> i=1:nx
+   <span class="keyword">for</span> j = 1:ny
+       n=j+(i-1)*ny; <span class="comment">%Move up each column and then over to next row</span>
+       <span class="keyword">if</span>(i==1) <span class="comment">%left edge of frame (fixed v=1 volt)</span>
+
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+
+       <span class="keyword">elseif</span>(i==nx) <span class="comment">%right edge of frame (fixed v=0 volt)</span>
+
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+
+       <span class="keyword">elseif</span> (j == 1) <span class="comment">%bottom edge of frame (unfixed)</span>
+
+           G(n, n) = -sigma(i,j+1)-sigma(i+1,j)-sigma(i-1,j);
+           G(n, n+1) = sigma(i,j+1);
+           G(n, n+ny) = sigma(i+1,j);
+           G(n, n-ny) = sigma(i-1,j);
+
+       <span class="keyword">elseif</span> (j == ny) <span class="comment">%top edge of frame (unfixed)</span>
+
+            G(n, n) = -sigma(i,j-1)-sigma(i+1,j)-sigma(i-1,j);
+            G(n, n-1) = sigma(i,j-1);
+            G(n, n+ny) = sigma(i+1,j);
+            G(n, n-ny) = sigma(i-1,j);
+
+       <span class="keyword">else</span> <span class="comment">%Anywhere else in the frame (surrounded by 4 points)</span>
+
+            G(n, n) = (-sigma(i+1,j)-sigma(i-1,j)-sigma(i,j+1)-sigma(i,j-1));
+            G(n, n+1) = sigma(i,j+1);
+            G(n, n-1) = sigma(i,j-1);
+            G(n, n+ny) = sigma(i+1,j);
+            G(n, n-ny) = sigma(i-1,j);
+
+       <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Solve for solution</span>
+temp=G\v';
+
+<span class="comment">%Backmap 'temp' vector into a physical (readable) matrix</span>
+vmap=zeros(nx,ny);
+<span class="keyword">for</span> i=1:nx
+
+    <span class="keyword">for</span> j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+<span class="comment">%Plot the voltage map of frame</span>
+figure(1)
+surf(vmap)
+title(<span class="string">'Voltage Map across Frame'</span>)
+
+<span class="comment">%3.Electric Field</span>
+<span class="comment">%Electric Field is the gradient of the voltage</span>
+<span class="comment">%Generate two matrices, each contains the gradient with respect to a</span>
+<span class="comment">%direction</span>
+[Ey2,Ex2]=gradient(vmap);
+figure(2)
+quiver(Ex2',Ey2')
+title(<span class="string">'Quiver Plot of Electric Field'</span>)
+
+<span class="comment">%Flip matrices for Linear indexing of matrices in movie</span>
+Ex=flipud(Ex2');
+Ey=flipud(Ey2');
+</pre><img vspace="5" hspace="5" src="assignment3part2and3_01.png" alt=""> <img vspace="5" hspace="5" src="assignment3part2and3_02.png" alt=""> <h2>Monte Carlo Simulation:<a name="4"></a></h2><p>The particles will now move between the two boxes</p><pre class="codeinput">    <span class="comment">% Parameters of Particles (Electrons)</span>
+
+    mo=9.109e-31;
+    m=0.26*mo;
+    q=-1.602*10^-19;
+
+    <span class="comment">%boltzman constant</span>
+    k=1.38064e-23;
+
+    <span class="comment">%Thermal velocity</span>
+    vt=@(t) sqrt(k*t/m);
+    vth=vt(300);
+    fprintf(<span class="string">'The expected thermal velocity is %6.4f m/s \n'</span>,vt(300))
+    fprintf(<span class="string">'The expected mean time between collisions is 0.2 e-12 seconds \n'</span>)
+
+    <span class="comment">%mean time collisions is 0.2 ps</span>
+    tmn=0.2*10^-12;
+
+    <span class="comment">%mean free path</span>
+    mnfreepath=tmn*vt(300);
+    fprintf(<span class="string">'The expected meanfreepath is %6.4f e-08 meters \n'</span>,mnfreepath*10^8)
+    fprintf(<span class="string">'-------------------------------------------------------------\n'</span>)
+
+    <span class="comment">%Nominal Size of Frame is 200nm x 100nm</span>
+    l=300*10^-9;
+    w=200*10^-9;
+
+    <span class="comment">%Time step</span>
+    deltaT=1e-15; <span class="comment">%7.562*10^-16;</span>
+
+    <span class="comment">%Number of particles</span>
+    num=30000;
+    partplot=randi([1,num],1,80); <span class="comment">%Plot 80 random particles</span>
+
+    <span class="comment">%The vertical and horizontal coordinate for each particle is generated</span>
+    vertarray=rand(num,1)*w;
+    horarray=rand(num,1)*l;
+
+    <span class="comment">%Will store rounded coordinate values (integers)</span>
+    roundvarray=zeros(num,1);
+    roundharray=zeros(num,1);
+
+    <span class="comment">%Used for the linear indexing of electric fields</span>
+    index=zeros(num,1);
+
+    <span class="comment">%Stores the x- and y- acceleration of each particle</span>
+    accelx=zeros(num,1);
+    accely=zeros(num,1);
+
+    <span class="comment">%Two arrays are used to store each particles previous coordinate</span>
+    prh=horarray();
+    prv=vertarray();
+
+    <span class="comment">%Array of random velocities for each particle</span>
+    vx=randn(num,1).*vth/sqrt(2);
+    vy=randn(num,1).*vth/sqrt(2);
+
+    <span class="comment">%Array will store the total velocity of each particle</span>
+    vrms=sqrt(vx.^2 + vy.^2);
+
+    <span class="comment">% Ensure no particles start inside either box</span>
+    good=0;
+    <span class="keyword">while</span>(good==0)
+
+        x=((horarray&lt;3.5*l/5 &amp; horarray&gt;1.5*l/5) &amp; (vertarray&lt;w*2/5 | vertarray&gt;w*3/5));
+        vertarray(x)=rand(sum(x),1)*w;
+        horarray(x)=rand(sum(x),1)*l;
+
+        x=((horarray&lt;3.5*l/5 &amp; horarray&gt;1.5*l/5) &amp; (vertarray&lt;w*2/5 | vertarray&gt;w*3/5));
+        <span class="keyword">if</span>(sum(x)==0)
+            good=1;
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+    <span class="comment">% Run movie for 4000 cycles</span>
+
+    <span class="keyword">for</span> i=1:4000
+
+
+        <span class="comment">%Horizontal boundary conditions</span>
+        horarray(horarray&gt;=l)=horarray(horarray&gt;=l)-l;
+        horarray(horarray&lt;=0)=horarray(horarray&lt;=0)+l;
+
+        <span class="comment">%vertical boundary conditions</span>
+        IT=(vertarray&gt;=w);
+        vy(IT)=-vy(IT);
+        vertarray(IT)=(vertarray(IT)-2*(vertarray(IT)-w));
+
+        IT=(vertarray&lt;=0);
+        vy(IT)=-vy(IT);
+        vertarray(IT)=(vertarray(IT)+2*(0-vertarray(IT)));
+
+        <span class="comment">%Question 1 related: check to see if particles are within either of</span>
+        <span class="comment">%the two boxes</span>
+            x=((horarray&lt;3.5*l/5 &amp; horarray&gt;1.5*l/5) &amp; (vertarray&lt;w*2/5 | vertarray&gt;w*3/5));
+            L=((prh&lt;3.5*l/5 &amp; prh&gt;1.5*l/5)&amp;(x));
+                vy(L)=-vy(L);
+                horarray(L) = prh(L);
+                vertarray(L) = prv(L);
+            NN=((prh&gt;3.5*l/5 | prh&lt;1.5*l/5)&amp; (x));
+                vx(NN)=-vx(NN);
+                horarray(NN) = prh(NN);
+                vertarray(NN) = prv(NN);
+
+
+       <span class="comment">%store previous coordinate for each particle</span>
+        prh=horarray;
+        prv=vertarray;
+
+         <span class="comment">% Round vertical and horizontal coordinates</span>
+        roundvarray=floor(vertarray*10^8)+1;
+        roundharray=floor(horarray*10^8)+1;
+
+        <span class="comment">% Linear Indexing of Ex and Ey fields</span>
+        index=sub2ind(size(Ex),[roundharray],[roundvarray]);
+
+         <span class="comment">%Solve for accelerations</span>
+        accelx=10^8*Ex(index)*q/m;
+        accely=10^8*Ey(index)*q/m;
+
+        <span class="comment">% Update velocities with accelerations</span>
+        vx=vx+accelx.*deltaT;
+        vy=vy+accely.*deltaT;
+
+        <span class="comment">%update coordinate for each particle using its x- and y- velocities</span>
+        horarray=horarray+vx.*deltaT;
+        vertarray=vertarray+vy.*deltaT;
+
+        <span class="comment">% Model the scattering of the electrons:</span>
+        pscat=1-exp(-deltaT/(0.2*10^-12));
+        a=rand(num,1);
+        si = a &lt; pscat;
+        <span class="comment">% Particle's assigned new velocity from Maxwell-Boltzmann</span>
+        <span class="comment">% distribution</span>
+        vx(si)=randn(sum(si),1).*vth/sqrt(2);
+        vy(si)=randn(sum(si),1).*vth/sqrt(2);
+        vrms=sqrt(vx.^2+vy.^2);
+
+
+        <span class="comment">% Plot only the first 200 iterations</span>
+        <span class="keyword">if</span> (i&lt;200)
+            figure (3)
+            plot(horarray(partplot), vertarray(partplot),<span class="string">'.'</span>)
+            title([<span class="string">'Movement of Electrons'</span>])
+            xlim([0 l])
+            ylim([0 w])
+            <span class="comment">%Question 1 related: Create the boxes onto the frame</span>
+
+            <span class="comment">%Box 1</span>
+            line([1.5*l/5 1.5*l/5],[w 3*w/5])
+            line([3.5*l/5 3.5*l/5],[w 3*w/5])
+            line([1.5*l/5 3.5*l/5],[w w])
+            line([1.5*l/5 3.5*l/5],[3*w/5 3*w/5])
+
+            <span class="comment">%Box 2</span>
+            line([1.5*l/5 1.5*l/5],[0 w*2/5])
+            line([3.5*l/5 3.5*l/5],[0 w*2/5])
+            line([1.5*l/5 3.5*l/5],[0 0])
+            line([1.5*l/5 3.5*l/5],[w*2/5 w*2/5])
+            hold <span class="string">on</span>
+            pause(1e-5)
+       <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+    <span class="comment">%End the movie</span>
+
+    <span class="comment">% Create density and temperature map</span>
+
+    <span class="comment">%Establish the grid to divide up the frame</span>
+    [binx,biny]=meshgrid(0:l/10:l,0:w/10:w);
+    <span class="comment">%This array will count the number of particles in each division of the frame</span>
+    zcheck=zeros(10,10);
+    <span class="comment">%This array will store the average temperature in each division of the frame</span>
+    tempcheck=zeros(10,10);
+    counter=0;
+    vtotal=0;
+    <span class="comment">%Cycle through each division of the frame</span>
+    <span class="keyword">for</span> i=1:10
+        txmn=binx(1,i);
+        txmx=binx(1,i+1);
+        <span class="keyword">for</span> r =1:10
+            tymn=biny(r,1);
+            tymx=biny(r+1,1);
+
+            <span class="comment">%Cycle through each particle</span>
+            <span class="keyword">for</span> mm=1:num
+                <span class="comment">%Check to see if particle is within this division of the frame</span>
+                <span class="keyword">if</span>(horarray(mm)&gt;txmn &amp; horarray(mm)&lt;txmx &amp; vertarray(mm)&lt;tymx &amp; vertarray(mm)&gt;tymn)
+                    counter=counter+1;
+                    zcheck(r,i)=zcheck(r,i)+1;
+                    vtotal=vtotal+sqrt(vx(mm)^2+vy(mm)^2);
+                    <span class="keyword">if</span>(counter~=0)
+                        tempcheck(r,i)=m*(vtotal^2)/(counter*k);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            vtotal=0;
+            counter=0;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">%Question 3: Plot the electron density map</span>
+    figure(5)
+    surf(flipud(zcheck))
+    title(<span class="string">'Final Position Electron Density Map end'</span>)
+    zlabel(<span class="string">'Number of Electrons in Section'</span>)
+
+    <span class="comment">%Question 4: Plot the temperature map</span>
+    figure(6)
+    surf(flipud(tempcheck))
+    title(<span class="string">'Final Temperature Density Map'</span>)
+    zlabel(<span class="string">'Temperature in Section'</span>)
+</pre><pre class="codeoutput">The expected thermal velocity is 132244.8682 m/s 
+The expected mean time between collisions is 0.2 e-12 seconds 
+The expected meanfreepath is 2.6449 e-08 meters 
+-------------------------------------------------------------
+</pre><img vspace="5" hspace="5" src="assignment3part2and3_03.png" alt=""> <img vspace="5" hspace="5" src="assignment3part2and3_04.png" alt=""> <img vspace="5" hspace="5" src="assignment3part2and3_05.png" alt=""> <h2>Summary<a name="5"></a></h2><pre class="codeinput">    <span class="comment">%As the field increases in strength, more particles will become trapped</span>
+    <span class="comment">%at the edges of the two boxes. At the same time the particles that</span>
+    <span class="comment">%move along the central axis of the frame will move at a much faster</span>
+    <span class="comment">%pace (increasing the temperature). The longer the movie runs the more</span>
+    <span class="comment">%particles end up trapped at edge of boxes.</span>
+
+    <span class="comment">% Next Step:</span>
+    <span class="comment">% The simulation could be made to be more accurate by taking</span>
+    <span class="comment">% an average of the nearest Ex and Ey field values from a</span>
+    <span class="comment">% given particle. In this simulation I simply use the nearest Ex and Ey</span>
+    <span class="comment">% value to solve for the acceleration. This could be adjusted to be</span>
+    <span class="comment">% more accurate</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%Assignment 3: Part 3
+%% Part 3: Question A
+%Firstly, the voltage map and electric field plots shown in part2 will be
+%generated again. This time, the voltage map will be coupled with the monte
+%carlo simulation of the particles moving amongst two conductive
+%(reflective) material. 
+clc
+%% Generate the Voltage Map and Electric Fields
+%The finite difference method will be used again:
+
+%Set Frame Size 
+L=30;
+nx = 2*L/3;
+ny = L;
+
+%Voltage at boundary
+vx=1;
+
+G = sparse(nx*ny);
+v = zeros(1,nx*ny);
+
+%Conductivity outside box
+sig1 = 1;
+%Conductivity inside box 
+sig2 = 1e-2;
+
+%Establish dimensions of each box
+% [Left side, right side, top of box, bottom of box]
+box1 = [nx*1.5/5 nx*3.5/5 ny ny*3/5];
+box2 = [nx*1.5/5 nx*3.5/5 ny*2/5 0];
+
+%1. Distribution of conductivity in material (conductivity matrix)
+sigma=ones(nx,ny);
+for i=1:nx
+    for j=1:ny
+        if(i > box1(1) && i < box1(2) && (j < box2(3)||j > box1(4)))
+            sigma(i,j)=1e-2;
+        end
+    end
+end
+%2. Build G matrix and plot Voltage Map
+for i=1:nx
+   for j = 1:ny 
+       n=j+(i-1)*ny; %Move up each column and then over to next row 
+       if(i==1) %left edge of frame (fixed v=1 volt)
+           
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+           
+       elseif(i==nx) %right edge of frame (fixed v=0 volt)
+          
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+           
+       elseif (j == 1) %bottom edge of frame (unfixed)
+           
+           G(n, n) = -sigma(i,j+1)-sigma(i+1,j)-sigma(i-1,j);
+           G(n, n+1) = sigma(i,j+1);
+           G(n, n+ny) = sigma(i+1,j);
+           G(n, n-ny) = sigma(i-1,j);
+            
+       elseif (j == ny) %top edge of frame (unfixed)
+           
+            G(n, n) = -sigma(i,j-1)-sigma(i+1,j)-sigma(i-1,j);
+            G(n, n-1) = sigma(i,j-1);
+            G(n, n+ny) = sigma(i+1,j);
+            G(n, n-ny) = sigma(i-1,j);
+               
+       else %Anywhere else in the frame (surrounded by 4 points) 
+           
+            G(n, n) = (-sigma(i+1,j)-sigma(i-1,j)-sigma(i,j+1)-sigma(i,j-1));
+            G(n, n+1) = sigma(i,j+1);
+            G(n, n-1) = sigma(i,j-1);
+            G(n, n+ny) = sigma(i+1,j);
+            G(n, n-ny) = sigma(i-1,j);
+         
+       end
+    end
+end
+
+%Solve for solution 
+temp=G\v';
+
+%Backmap 'temp' vector into a physical (readable) matrix 
+vmap=zeros(nx,ny);
+for i=1:nx
+    
+    for j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);  
+         
+    end
+        
+end
+
+%Plot the voltage map of frame
+figure(1)
+surf(vmap)
+title('Voltage Map across Frame')
+
+%3.Electric Field 
+%Electric Field is the gradient of the voltage
+%Generate two matrices, each contains the gradient with respect to a
+%direction
+[Ey2,Ex2]=gradient(vmap);
+figure(2)
+quiver(Ex2',Ey2')
+title('Quiver Plot of Electric Field')
+
+%Flip matrices for Linear indexing of matrices in movie
+Ex=flipud(Ex2');
+Ey=flipud(Ey2');
+
+%% Monte Carlo Simulation:
+% The particles will now move between the two boxes
+
+    % Parameters of Particles (Electrons)
+    
+    mo=9.109e-31;
+    m=0.26*mo;
+    q=-1.602*10^-19;
+    
+    %boltzman constant
+    k=1.38064e-23;
+  
+    %Thermal velocity
+    vt=@(t) sqrt(k*t/m);
+    vth=vt(300);
+    fprintf('The expected thermal velocity is %6.4f m/s \n',vt(300))
+    fprintf('The expected mean time between collisions is 0.2 e-12 seconds \n')
+
+    %mean time collisions is 0.2 ps
+    tmn=0.2*10^-12;
+    
+    %mean free path
+    mnfreepath=tmn*vt(300);
+    fprintf('The expected meanfreepath is %6.4f e-08 meters \n',mnfreepath*10^8)
+    fprintf('REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n')
+
+    %Nominal Size of Frame is 200nm x 100nm
+    l=300*10^-9;
+    w=200*10^-9;
+
+    %Time step
+    deltaT=1e-15; %7.562*10^-16;
+
+    %Number of particles
+    num=30000;
+    partplot=randi([1,num],1,80); %Plot 80 random particles
+
+    %The vertical and horizontal coordinate for each particle is generated
+    vertarray=rand(num,1)*w;
+    horarray=rand(num,1)*l;
+    
+    %Will store rounded coordinate values (integers)
+    roundvarray=zeros(num,1);
+    roundharray=zeros(num,1);
+    
+    %Used for the linear indexing of electric fields
+    index=zeros(num,1);
+    
+    %Stores the x- and y- acceleration of each particle
+    accelx=zeros(num,1);
+    accely=zeros(num,1);
+    
+    %Two arrays are used to store each particles previous coordinate
+    prh=horarray();
+    prv=vertarray();
+
+    %Array of random velocities for each particle
+    vx=randn(num,1).*vth/sqrt(2);
+    vy=randn(num,1).*vth/sqrt(2);
+
+    %Array will store the total velocity of each particle
+    vrms=sqrt(vx.^2 + vy.^2);
+
+    % Ensure no particles start inside either box
+    good=0;
+    while(good==0)
+       
+        x=((horarray<3.5*l/5 & horarray>1.5*l/5) & (vertarray<w*2/5 | vertarray>w*3/5));
+        vertarray(x)=rand(sum(x),1)*w;
+        horarray(x)=rand(sum(x),1)*l;
+        
+        x=((horarray<3.5*l/5 & horarray>1.5*l/5) & (vertarray<w*2/5 | vertarray>w*3/5));
+        if(sum(x)==0)
+            good=1;
+        end
+        
+    end
+
+    % Run movie for 4000 cycles
+    
+    for i=1:4000
+        
+        
+        %Horizontal boundary conditions
+        horarray(horarray>=l)=horarray(horarray>=l)-l;
+        horarray(horarray<=0)=horarray(horarray<=0)+l;
+    
+        %vertical boundary conditions
+        IT=(vertarray>=w);
+        vy(IT)=-vy(IT);
+        vertarray(IT)=(vertarray(IT)-2*(vertarray(IT)-w));
+        
+        IT=(vertarray<=0);
+        vy(IT)=-vy(IT);
+        vertarray(IT)=(vertarray(IT)+2*(0-vertarray(IT)));
+        
+        %Question 1 related: check to see if particles are within either of
+        %the two boxes
+            x=((horarray<3.5*l/5 & horarray>1.5*l/5) & (vertarray<w*2/5 | vertarray>w*3/5));
+            L=((prh<3.5*l/5 & prh>1.5*l/5)&(x));
+                vy(L)=-vy(L);
+                horarray(L) = prh(L);
+                vertarray(L) = prv(L);
+            NN=((prh>3.5*l/5 | prh<1.5*l/5)& (x));
+                vx(NN)=-vx(NN);
+                horarray(NN) = prh(NN);
+                vertarray(NN) = prv(NN);      
+   
+        
+       %store previous coordinate for each particle
+        prh=horarray;
+        prv=vertarray;
+        
+         % Round vertical and horizontal coordinates
+        roundvarray=floor(vertarray*10^8)+1;
+        roundharray=floor(horarray*10^8)+1;
+        
+        % Linear Indexing of Ex and Ey fields
+        index=sub2ind(size(Ex),[roundharray],[roundvarray]);
+        
+         %Solve for accelerations
+        accelx=10^8*Ex(index)*q/m;
+        accely=10^8*Ey(index)*q/m;
+        
+        % Update velocities with accelerations
+        vx=vx+accelx.*deltaT;
+        vy=vy+accely.*deltaT;
+      
+        %update coordinate for each particle using its x- and y- velocities
+        horarray=horarray+vx.*deltaT;
+        vertarray=vertarray+vy.*deltaT;
+
+        % Model the scattering of the electrons:
+        pscat=1-exp(-deltaT/(0.2*10^-12));
+        a=rand(num,1);
+        si = a < pscat;  
+        % Particle's assigned new velocity from Maxwell-Boltzmann
+        % distribution
+        vx(si)=randn(sum(si),1).*vth/sqrt(2);
+        vy(si)=randn(sum(si),1).*vth/sqrt(2);
+        vrms=sqrt(vx.^2+vy.^2);
+              
+        
+        % Plot only the first 200 iterations
+        if (i<200)
+            figure (3)
+            plot(horarray(partplot), vertarray(partplot),'.')
+            title(['Movement of Electrons'])
+            xlim([0 l])
+            ylim([0 w])
+            %Question 1 related: Create the boxes onto the frame 
+        
+            %Box 1 
+            line([1.5*l/5 1.5*l/5],[w 3*w/5])
+            line([3.5*l/5 3.5*l/5],[w 3*w/5])
+            line([1.5*l/5 3.5*l/5],[w w])
+            line([1.5*l/5 3.5*l/5],[3*w/5 3*w/5])
+   
+            %Box 2
+            line([1.5*l/5 1.5*l/5],[0 w*2/5])
+            line([3.5*l/5 3.5*l/5],[0 w*2/5])
+            line([1.5*l/5 3.5*l/5],[0 0])
+            line([1.5*l/5 3.5*l/5],[w*2/5 w*2/5])
+            hold on
+            pause(1e-5)
+       end
+     
+    end
+    %End the movie
+
+    % Create density and temperature map
+
+    %Establish the grid to divide up the frame
+    [binx,biny]=meshgrid(0:l/10:l,0:w/10:w);
+    %This array will count the number of particles in each division of the frame
+    zcheck=zeros(10,10);
+    %This array will store the average temperature in each division of the frame
+    tempcheck=zeros(10,10);
+    counter=0;
+    vtotal=0;
+    %Cycle through each division of the frame
+    for i=1:10
+        txmn=binx(1,i);
+        txmx=binx(1,i+1);
+        for r =1:10
+            tymn=biny(r,1);
+            tymx=biny(r+1,1);
+        
+            %Cycle through each particle
+            for mm=1:num
+                %Check to see if particle is within this division of the frame
+                if(horarray(mm)>txmn & horarray(mm)<txmx & vertarray(mm)<tymx & vertarray(mm)>tymn)
+                    counter=counter+1;
+                    zcheck(r,i)=zcheck(r,i)+1;
+                    vtotal=vtotal+sqrt(vx(mm)^2+vy(mm)^2);
+                    if(counter~=0)
+                        tempcheck(r,i)=m*(vtotal^2)/(counter*k);
+                    end
+                end
+            end
+            vtotal=0;
+            counter=0;
+        end
+    end
+    %Question 3: Plot the electron density map
+    figure(5)
+    surf(flipud(zcheck))
+    title('Final Position Electron Density Map end')
+    zlabel('Number of Electrons in Section')
+
+    %Question 4: Plot the temperature map
+    figure(6)
+    surf(flipud(tempcheck))
+    title('Final Temperature Density Map')
+    zlabel('Temperature in Section')
+    
+    %% Summary 
+    
+    %As the field increases in strength, more particles will become trapped
+    %at the edges of the two boxes. At the same time the particles that
+    %move along the central axis of the frame will move at a much faster
+    %pace (increasing the temperature). The longer the movie runs the more
+    %particles end up trapped at edge of boxes.
+    
+    % Next Step:
+    % The simulation could be made to be more accurate by taking
+    % an average of the nearest Ex and Ey field values from a
+    % given particle. In this simulation I simply use the nearest Ex and Ey
+    % value to solve for the acceleration. This could be adjusted to be
+    % more accurate
+##### SOURCE END #####
+--></body></html>
